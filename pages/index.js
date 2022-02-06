@@ -277,7 +277,7 @@ export default function Index () {
         </div>
       </section>
       <div className='a_s_b_credits'>
-        <p>Made with 💜 by <a target="_blank" href="https://github.com/binolt">steven</a></p>
+        <p>Made with 💜 by <a target="_blank" rel="noreferrer" href="https://github.com/binolt">steven</a></p>
       </div>
     </div>
   )
