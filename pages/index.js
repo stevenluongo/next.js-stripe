@@ -10,8 +10,17 @@ import Select from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import LoadingButton from '@mui/lab/LoadingButton';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import {loadStripe} from '@stripe/stripe-js';
+import { Elements, CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import { destroyCookie, parseCookies, setCookie } from "nookies";
+import { fetchPaymentIntent, appendInvoiceItems, finalizeStripeInvoice, createStripeCustomer, createStripeInvoice, calculateShipping, checkoutStorage } from "../lib/stripe";
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
+
+
+
 const CssTextField = styled(TextField)({
   '& label.Mui-focused': {
     color: 'var(--primary-text-accent)',
@@ -52,8 +61,8 @@ const default_billing_details = {
   last_name: "Doe",
   email_address: "johndoe@gmail.com",
   address_line_1: "1234 example road",
-  country: 10,
-  state: 10,
+  country: {label: "United States", value: 10},
+  state: {label: "Florida", value: 10},
   city: "Boca Raton",
   zipcode: "33485"
 }
@@ -62,18 +71,15 @@ const default_billing_details = {
 export default function Index () {
   const [step, setStep] = useState(0);
   const [billing_details, setBillingDetails] = useState(default_billing_details);
-  const [delivery_preference, setDeliveryPreference] = useState({pickup: false, usps: false, fedex: true});
+  const [delivery_preference, setDeliveryPreference] = useState({pickup: false, usps: false, fedex: false});
   const [message, setMessage] = useState(null);
-  const [shipping_address_preference, setShippingAddressPreference] = useState(true);
-  const [age, setAge] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [vatTax, setVatTax] = useState(4.07);
+  const [subtotal, setSubTotal] = useState(67.99);
+  const [total, setTotal] = useState(67.99 + 4.07)
 
-  const handleSelectChange = (event) => {
-    setAge(event.target.value);
-  };
-  const handleInformationSubmit = async(e) => {
+  const handleInformationSubmit = async() => {
     setMessage(null);
-    e.preventDefault();
     //few things we need to do here
     const {first_name, last_name, email_address, address_line_1, country, state, city, zipcode} = billing_details;
 
@@ -86,9 +92,18 @@ export default function Index () {
 
     //sync data in local storage
     await checkoutStorage.setItem("billing_details", billing_details);
-    
     //move user to next step in checkout process
+    setStep(1)
 }
+  const handleDeliverySubmit = async() => {
+    if(!delivery_preference.fedex && !delivery_preference.usps && !delivery_preference.pickup) {
+      setMessage({msgBody: "Please pick an option", msgError: true});
+      return;
+    }
+
+    await checkoutStorage.setItem("delivery_preference", delivery_preference);
+    setStep(2);
+  }
 
 const handleCheckboxChange = (target) => {
   const mutated_state = {
@@ -96,6 +111,22 @@ const handleCheckboxChange = (target) => {
     usps: false,
     pickup :false,
     [target] : !delivery_preference[target]
+  }
+  if(target === "fedex") {
+    const updatedSubtotal = subtotal + 4.99;
+    const newVax = (updatedSubtotal * 0.06);
+    setVatTax(newVax.toFixed(2));
+    setTotal((newVax + updatedSubtotal).toFixed(2))
+  } 
+  else if(target === 'usps') {
+    const updatedSubtotal = subtotal + 11.50;
+    const newVax = (updatedSubtotal * 0.06);
+    setVatTax(newVax.toFixed(2));
+    setTotal((newVax + updatedSubtotal).toFixed(2))
+  }
+  else if(target === "pickup") {
+    setVatTax(4.07);
+    setTotal(67.99 + 4.07)
   }
   setDeliveryPreference(mutated_state);
 }
@@ -111,6 +142,16 @@ const handleCheckboxChange = (target) => {
   const handleStepUpdate = () => {
     setIsProcessing(true)
     setTimeout(() => {
+      if(step === 0) {
+        handleInformationSubmit();
+        setIsProcessing(false);
+        return;
+      }
+      if(step === 1) {
+        handleDeliverySubmit();
+        setIsProcessing(false);
+        return;
+      }
       setIsProcessing(false)
       setStep(step + 1)
     }, 650);
@@ -172,9 +213,8 @@ const handleCheckboxChange = (target) => {
                     <Select
                       labelId="demo-simple-select-helper-label"
                       id="demo-simple-select-helper"
-                      value={billing_details.country}
+                      value={billing_details.country.value}
                       label="Country"
-                      onChange={handleSelectChange}
                       style={{color: 'var(--primary-text-color)'}}
                       className="a_c_d_b_d_select"
                     >
@@ -187,9 +227,8 @@ const handleCheckboxChange = (target) => {
                     <Select
                       labelId="demo-simple-select-helper-label"
                       id="demo-simple-select-helper"
-                      value={billing_details.state}
+                      value={billing_details.state.value}
                       label="State"
-                      onChange={handleSelectChange}
                       style={{color: 'var(--primary-text-color)'}}
                       className="a_c_d_b_d_select"
                     >
@@ -198,6 +237,7 @@ const handleCheckboxChange = (target) => {
                   </FormControl>
                   <CssTextField label="City" id="custom-css-outlined-input" value={billing_details.city} onChange={handleChange} name="city" />
                   <CssTextField label="Zip" id="custom-css-outlined-input" value={billing_details.zipcode} onChange={handleChange} name="zipcode" />
+                  {message && <p style={{width: '300px'}}>{message.msgBody}</p>}
                 </span>
               </form>
             </CSSTransition>
@@ -233,10 +273,13 @@ const handleCheckboxChange = (target) => {
                   </div>
                   <p>FREE</p>
                 </div>
+                {message && <p>{message.msgBody}</p>}
               </div>
             </CSSTransition>
             <CSSTransition delay={500} in={step === 2} classNames="a_c_d_b_transition_2" timeout={1000} unmountOnExit>
-              <p>Payment</p>
+              <Elements stripe={stripePromise}>
+                  <CheckoutPayment/>
+              </Elements>
             </CSSTransition>
           </div>
           <div className="a_c_d_summary">
@@ -251,26 +294,26 @@ const handleCheckboxChange = (target) => {
             <div className="a_c_d_summary_item" style={{borderRadius: 0}}>
               <span style={{marginBottom: '2rem'}} className="a_c_d_summary_item_span">
                 <p>Shipping</p>
-                <p>TBD</p>
+                <p>{delivery_preference.fedex ? '$4.99' : delivery_preference.usps ? '$11.50' : delivery_preference.pickup ? 'FREE' : "TBD"}</p>
               </span>
               <span className="a_c_d_summary_item_span">
-                <p>VAT</p>
-                <p>$3.99</p>
+                <p>Taxes</p>
+                <p>${vatTax}</p>
               </span>
             </div>
             <div className="a_c_d_summary_item" style={{borderTopLeftRadius: 0, borderTopRightRadius: 0}}>
               <span style={{marginBottom: '1.5rem'}} className="a_c_d_summary_item_span">
                 <h3>Total</h3>
-                <h3>$70.39</h3>
+                <h3>${total}</h3>
               </span>
               <VisualizeButton
-                className='visualize'
+                className='a_c_d_summary_item_button'
                 onClick={handleStepUpdate}
                 loading={isProcessing}
-                loadingPosition="end"
                 variant="contained"
+                startIcon={step === 2 && <AttachMoneyIcon/>}
             >
-              Next
+              {step === 2 ? 'Pay' : 'Next'}
             </VisualizeButton>
               <div className="a_c_d_summary_item_promo">Have a promo code?</div>
             </div>
@@ -285,10 +328,129 @@ const handleCheckboxChange = (target) => {
 
 const VisualizeButton = styled(LoadingButton)({
   color: '#cfc4ff',
-  backgroundColor: '#3f22c0',
+  backgroundColor: 'var(--primary-text-accent)',
+  color: '#fff',
   '&:hover': {
     backgroundColor: '#472cac',
   },
-  '&:disabled': {
-  },
+  '&:disabled' : {
+    color: 'lightgrey'
+  }
 })
+
+
+function CheckoutPayment() {
+  const [payment_message, setPaymentMessage] = useState(null);
+  
+  //hooks
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const handleSubmit = async(e) => {
+      e.preventDefault();
+
+      //fetch payment_intent_id from cookies
+      let { payment_intent_id, customer_id } = parseCookies();
+
+      //if no existing payment_intent
+      if(!payment_intent_id) {
+          try {
+              console.log('here')
+              //create a new customer on stripe
+              if(!customer_id) {
+                  const id = await createStripeCustomer();
+                  customer_id = id;
+              }
+
+              //store customer_id in cookies
+              setCookie(null, 'customer_id', customer_id, {
+                  maxAge: 30 * 24 * 60 * 60,
+                  path: '/',
+              });
+
+              //append invoice items to customer
+              await appendInvoiceItems(customer_id);
+
+              //append shipping costs to user
+              await calculateShipping(customer_id);
+
+              //create invoice on customer
+              const invoice_id = await createStripeInvoice(customer_id);
+
+              //store invoice_id in cookies
+              setCookie(null, 'invoice_id', invoice_id, {
+                  maxAge: 30 * 24 * 60 * 60,
+                  path: '/',
+              });
+              
+              //finalize invoice
+              const finalized_invoice = await finalizeStripeInvoice(invoice_id);
+
+              //update payment_intent_id
+              payment_intent_id = finalized_invoice.payment_intent;
+
+              //store payment_intent_id in cookies
+              setCookie(null, 'payment_intent_id', payment_intent_id, {
+                  maxAge: 30 * 24 * 60 * 60,
+                  path: '/',
+              });
+
+          } catch (err) {
+              //display errors
+              setPaymentMessage({msgBody: err.message, msgError: true});
+              return;
+          }
+      }
+
+      try {
+          //fetch payment intent
+          const payment_intent = await fetchPaymentIntent(payment_intent_id);
+
+          //confirm card payment
+          const { status } = await confirmCardPayment(payment_intent, elements, stripe);
+
+          //on successful payment
+          if(status === "succeeded") {
+              //display success message
+              setPaymentMessage({msgBody: "Payment Successfully processed !", msgError: false});
+
+
+              //clear cookies
+              destroyCookie(null, 'payment_intent_id');
+              destroyCookie(null, 'customer_id');
+              destroyCookie(null, 'invoice_id');
+
+              // clear local storage
+              checkoutStorage.removeItem('billing_details');
+              checkoutStorage.removeItem('delivery_preference');
+
+              //redirect to success page
+              console.log("DONE");
+          }
+
+          //on fail payment
+      } catch (err) {
+          //display errors
+          setPaymentMessage({msgBody: err.message, msgError: true});
+          return;
+      }
+  }
+  return (
+      <form onSubmit={handleSubmit} style={{width: 250}}>
+          <CardElement/>
+          <button type="submit" disabled={!stripe}>Submit Order</button>
+          {payment_message && <p>{payment_message.msgBody}</p>}
+      </form>
+  )
+}
+
+const confirmCardPayment = async(payment_intent, elements, stripe) => {
+  const {error, paymentIntent} = await stripe.confirmCardPayment(payment_intent.client_secret, {
+      payment_method: {
+          card: elements.getElement(CardElement)
+      }
+  });
+  //handle errors
+  if(error) throw new Error(error.message, error.type);
+  return paymentIntent;
+}
