@@ -4,7 +4,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const handler = async (req, res) => {
     try {
-        const payment_intent_id = req.url.replace("/api/stripe/payment-intent?id=", "");
+        const payment_intent_id = req.url.replace("/api/payment-intent?id=", "");
         const payment_intent = await stripe.paymentIntents.retrieve(
             payment_intent_id
         );

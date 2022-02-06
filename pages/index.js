@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import ContactlessIcon from '@mui/icons-material/Contactless';
 import { CSSTransition } from 'react-transition-group';
 import InputLabel from '@mui/material/InputLabel';
@@ -15,6 +15,7 @@ import { VisualizeButton, CssTextField } from "../lib/components";
 import { default_billing_details } from "../lib/data";
 import Checkout from "../components/checkout";
 import { checkoutStorage } from "../lib/stripe";
+import { base_url } from "../utils/url";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
@@ -27,6 +28,17 @@ export default function Index () {
   const [vatTax, setVatTax] = useState(4.07);
   const [total, setTotal] = useState(67.99 + 4.07)
   const childCompRef = useRef()
+
+
+
+  useEffect(() => {
+    const fetchData = async() => {
+      const res = await fetch(`${base_url}/api/hello`);
+      const data = await res.json();
+      console.log(data)
+    }
+    fetchData();
+  }, []);
 
   const subtotal = 67.99
 
