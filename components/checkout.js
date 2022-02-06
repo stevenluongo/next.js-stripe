@@ -120,5 +120,6 @@ const confirmCardPayment = async(payment_intent, elements, stripe) => {
     return paymentIntent;
 }
 
+Checkout.displayName = 'Checkout';
 
 export default Checkout;
