@@ -8,12 +8,10 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
-import FavoriteBorder from '@mui/icons-material/FavoriteBorder';
-import Favorite from '@mui/icons-material/Favorite';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
+import LoadingButton from '@mui/lab/LoadingButton';
 const CssTextField = styled(TextField)({
   '& label.Mui-focused': {
     color: 'var(--primary-text-accent)',
@@ -68,6 +66,7 @@ export default function Index () {
   const [message, setMessage] = useState(null);
   const [shipping_address_preference, setShippingAddressPreference] = useState(true);
   const [age, setAge] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleSelectChange = (event) => {
     setAge(event.target.value);
@@ -109,6 +108,14 @@ const handleCheckboxChange = (target) => {
     setBillingDetails(mutated_state);
 }
 
+  const handleStepUpdate = () => {
+    setIsProcessing(true)
+    setTimeout(() => {
+      setIsProcessing(false)
+      setStep(step + 1)
+    }, 650);
+  }
+
   return (
     <div className="a_wrap">
       <nav className="a_nav">
@@ -123,7 +130,7 @@ const handleCheckboxChange = (target) => {
             className="a_c_s_bubble a_c_s_bubble_outline" 
             style={{backgroundColor: step === 0 ? 'var(--primary-text-accent)' : 'transparent'}}
           >
-            <span onClick={() => setStep(0)}>
+            <span onClick={() => !isProcessing && setStep(0)}>
               <p style={{color: step === 0 ? 'var(--primary-text-accent)' : '#bfbcc4'}}>Step 01</p>
               <h1 style={{color: step === 0 ? 'var(--primary-text-color)' : '#bfbcc4', fontSize: step === 0 ? '1.8em' : '1.2em'}}>Personal Details</h1>
             </span>
@@ -133,7 +140,7 @@ const handleCheckboxChange = (target) => {
             className="a_c_s_bubble a_c_s_bubble_outline" 
             style={{backgroundColor: step === 1 ? 'var(--primary-text-accent)' : 'transparent'}}
           >
-            <span onClick={() => setStep(1)}>
+            <span onClick={() => !isProcessing && setStep(1)}>
               <p style={{color: step === 1 ? 'var(--primary-text-accent)' : '#bfbcc4'}}>Step 02</p>
               <h1 style={{color: step === 1 ? 'var(--primary-text-color)' : '#bfbcc4', fontSize: step === 1 ? '1.8em' : '1.2em'}}>Delivery</h1>
             </span>
@@ -143,7 +150,7 @@ const handleCheckboxChange = (target) => {
             className="a_c_s_bubble a_c_s_bubble_outline" 
             style={{backgroundColor: step === 2 ? 'var(--primary-text-accent)' : 'transparent'}}
           >
-            <span onClick={() => setStep(2)}>
+            <span onClick={() => !isProcessing && setStep(2)}>
               <p style={{color: step === 2 ? 'var(--primary-text-accent)' : '#bfbcc4'}}>Step 03</p>
               <h1 style={{color: step === 2 ? 'var(--primary-text-color)' : '#bfbcc4', fontSize: step === 2 ? '1.8em' : '1.2em'}}>Payment</h1>
             </span>
@@ -232,10 +239,41 @@ const handleCheckboxChange = (target) => {
               <p>Payment</p>
             </CSSTransition>
           </div>
-          <div className="a_c_d_summary" >
-            <p>summary</p>
-            <button onClick={() => setStep(step - 1)}>Previous</button>
-            <button onClick={() => setStep(step + 1)}>Next</button>
+          <div className="a_c_d_summary">
+            <div className="a_c_d_summary_item" style={{borderBottomLeftRadius: 0, borderBottomRightRadius: 0}}>
+              <h1>Summary</h1>
+              <hr/>
+              <span className="a_c_d_summary_item_span">
+                <p>Pro (Lifetime)</p>
+                <p>$67.99</p>
+              </span>
+            </div>
+            <div className="a_c_d_summary_item" style={{borderRadius: 0}}>
+              <span style={{marginBottom: '2rem'}} className="a_c_d_summary_item_span">
+                <p>Shipping</p>
+                <p>TBD</p>
+              </span>
+              <span className="a_c_d_summary_item_span">
+                <p>VAT</p>
+                <p>$3.99</p>
+              </span>
+            </div>
+            <div className="a_c_d_summary_item" style={{borderTopLeftRadius: 0, borderTopRightRadius: 0}}>
+              <span style={{marginBottom: '1.5rem'}} className="a_c_d_summary_item_span">
+                <h3>Total</h3>
+                <h3>$70.39</h3>
+              </span>
+              <VisualizeButton
+                className='visualize'
+                onClick={handleStepUpdate}
+                loading={isProcessing}
+                loadingPosition="end"
+                variant="contained"
+            >
+              Next
+            </VisualizeButton>
+              <div className="a_c_d_summary_item_promo">Have a promo code?</div>
+            </div>
           </div>
         </div>
       </section>
@@ -243,4 +281,14 @@ const handleCheckboxChange = (target) => {
   )
 }
 
-{/* <CssTextField label="First Name" id="custom-css-outlined-input" value={billing_details.first_name} onChange={handleChange} name="first_name" /> */}
+
+
+const VisualizeButton = styled(LoadingButton)({
+  color: '#cfc4ff',
+  backgroundColor: '#3f22c0',
+  '&:hover': {
+    backgroundColor: '#472cac',
+  },
+  '&:disabled': {
+  },
+})
