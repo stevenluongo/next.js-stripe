@@ -1,93 +1,77 @@
 import { useState } from "react"
-import Particles from "react-tsparticles";
 import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import ContactlessIcon from '@mui/icons-material/Contactless';
-import { Fade } from 'react-reveal';
 import { CSSTransition } from 'react-transition-group';
-
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import Checkbox from '@mui/material/Checkbox';
+import FavoriteBorder from '@mui/icons-material/FavoriteBorder';
+import Favorite from '@mui/icons-material/Favorite';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 const CssTextField = styled(TextField)({
   '& label.Mui-focused': {
-    color: '#535353',
+    color: 'var(--primary-text-accent)',
   },
-
-  
   '& .MuiFormLabel-root': {
     fontSize: '14px',
-    color: "#bdbdbd"
+    color: "#bdbdbd",
   },
   '& .MuiInputLabel-shrink': {
     color: '#bdbdbd',
-    fontSize: '16px'
+    fontSize: '16px',
   },
 
   '& .MuiInputBase-input': {
-    color: '#bdbdbd',
+    color: 'var(--primary-text-color)',
     fontSize: '14px',
     padding: '1rem'
   },
   '& .MuiOutlinedInput-root': {
     marginBottom: '1.25rem',
     '& fieldset': {
-      border: '2px solid #424242',
+      border: '2px solid #d8d8d8',
+      transition: 'border-color 0.5s ease',
     },
     '&:hover fieldset': {
-      borderColor: '#2b2b2b',
+      borderColor: '#b1b1b1',
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#df304b',
+      borderColor: 'var(--primary-text-accent)',
     },
   },
 });
 
-export const options = {
-  fpsLimit: 60,
-  particles: {
-    color: {
-      value: "#ffffff",
-    },
-    move: {
-      direction: "none",
-      enable: true,
-      random: false,
-      speed: 1,
-      straight: false,
-    },
-    number: {
-      value: 25,
-    },
-    opacity: {
-      value: 0.25,
-    },
-    shape: {
-      type: "circle",
-    },
-    size: {
-      random: true,
-      value: 2,
-    },
-  },
-}
+const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 const default_billing_details = {
-  first_name: "john",
-  last_name: "doe",
+  first_name: "John",
+  last_name: "Doe",
   email_address: "johndoe@gmail.com",
   address_line_1: "1234 example road",
-  country: "United States",
-  state: "Florida",
+  country: 10,
+  state: 10,
   city: "Boca Raton",
-  zipcode: ""
+  zipcode: "33485"
 }
 
 
 export default function Index () {
   const [step, setStep] = useState(0);
   const [billing_details, setBillingDetails] = useState(default_billing_details);
-  const [delivery_preference, setDeliveryPreference] = useState({pickup: false, shipping: false});
+  const [delivery_preference, setDeliveryPreference] = useState({pickup: false, usps: false, fedex: true});
   const [message, setMessage] = useState(null);
   const [shipping_address_preference, setShippingAddressPreference] = useState(true);
+  const [age, setAge] = useState('');
 
+  const handleSelectChange = (event) => {
+    setAge(event.target.value);
+  };
   const handleInformationSubmit = async(e) => {
     setMessage(null);
     e.preventDefault();
@@ -105,6 +89,16 @@ export default function Index () {
     await checkoutStorage.setItem("billing_details", billing_details);
     
     //move user to next step in checkout process
+}
+
+const handleCheckboxChange = (target) => {
+  const mutated_state = {
+    fedex: false,
+    usps: false,
+    pickup :false,
+    [target] : !delivery_preference[target]
+  }
+  setDeliveryPreference(mutated_state);
 }
 
   const handleChange = (e) => {
@@ -141,7 +135,7 @@ export default function Index () {
           >
             <span onClick={() => setStep(1)}>
               <p style={{color: step === 1 ? 'var(--primary-text-accent)' : '#bfbcc4'}}>Step 02</p>
-              <h1 style={{color: step === 1 ? 'var(--primary-text-color)' : '#bfbcc4', fontSize: step === 1 ? '1.8em' : '1.2em'}}>Shipping</h1>
+              <h1 style={{color: step === 1 ? 'var(--primary-text-color)' : '#bfbcc4', fontSize: step === 1 ? '1.8em' : '1.2em'}}>Delivery</h1>
             </span>
           </div>
           <hr style={{height:(step === 0 || step === 2) && '70px'}}/>
@@ -158,10 +152,81 @@ export default function Index () {
         <div className="a_c_display">
           <div className="a_c_d_body" style={{marginTop: step === 0 ? 64 : step === 1 ? 150 : 230}}>
             <CSSTransition delay={500} in={step === 0} classNames="a_c_d_b_transition_2" timeout={1000} unmountOnExit>
-              <p>Details</p>
+              <form className="a_c_d_b_details">
+                <span className="a_c_d_b_details_double">
+                  <CssTextField label="First Name" id="custom-css-outlined-input" value={billing_details.first_name} onChange={handleChange} name="first_name" />
+                  <CssTextField label="Last Name" id="custom-css-outlined-input" value={billing_details.last_name} onChange={handleChange} name="last_name" />
+                </span>
+                  <CssTextField label="Email Address" id="custom-css-outlined-input" value={billing_details.email_address} onChange={handleChange} name="email_address" />
+                  <CssTextField label="Address Line 1" id="custom-css-outlined-input" value={billing_details.address_line_1} onChange={handleChange} name="address_line_1" />
+                  {/* <CssTextField label="Country" id="custom-css-outlined-input" value={billing_details.country} onChange={handleChange} name="country" /> */}
+                  <FormControl sx={{mb: 3, borderColor: 'orange'}}>
+                    <InputLabel style={{color: "#bdbdbd"}} id="demo-simple-select-helper-label">Country</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-helper-label"
+                      id="demo-simple-select-helper"
+                      value={billing_details.country}
+                      label="Country"
+                      onChange={handleSelectChange}
+                      style={{color: 'var(--primary-text-color)'}}
+                      className="a_c_d_b_d_select"
+                    >
+                      <MenuItem value={10}>United States</MenuItem>
+                    </Select>
+                  </FormControl>
+                <span className="a_c_d_b_details_triple">
+                <FormControl sx={{mb: 3, borderColor: 'orange'}}>
+                    <InputLabel style={{color: "#bdbdbd"}} id="demo-simple-select-helper-label">State</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-helper-label"
+                      id="demo-simple-select-helper"
+                      value={billing_details.state}
+                      label="State"
+                      onChange={handleSelectChange}
+                      style={{color: 'var(--primary-text-color)'}}
+                      className="a_c_d_b_d_select"
+                    >
+                      <MenuItem value={10}>Florida</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <CssTextField label="City" id="custom-css-outlined-input" value={billing_details.city} onChange={handleChange} name="city" />
+                  <CssTextField label="Zip" id="custom-css-outlined-input" value={billing_details.zipcode} onChange={handleChange} name="zipcode" />
+                </span>
+              </form>
             </CSSTransition>
             <CSSTransition delay={500} in={step === 1} classNames="a_c_d_b_transition_2" timeout={1000} unmountOnExit>
-              <p>Shipping</p>
+              <div className="a_c_d_b_delivery">
+                <div className="a_c_d_b_d_item" style={{borderColor: delivery_preference.fedex && 'var(--primary-text-accent)', backgroundColor:delivery_preference.fedex && '#f6f3ff' }}  onClick={() => handleCheckboxChange('fedex')}>
+                  <div className="a_c_d_b_d_item_body">
+                    <Checkbox checked={delivery_preference.fedex} {...label} icon={<CheckCircleOutlineIcon />} checkedIcon={<CheckCircleIcon />} />
+                    <span style={{marginLeft: '0.5rem', width: '90%'}}>
+                      <h3>FedEx International</h3>
+                      <p>Shipment will arrive in about 3-5 days shipping</p>
+                    </span>
+                  </div>
+                  <p>$4.99</p>
+                </div>
+                <div className="a_c_d_b_d_item" style={{borderColor: delivery_preference.usps && 'var(--primary-text-accent)', backgroundColor:delivery_preference.usps && '#f6f3ff' }} onClick={() => handleCheckboxChange('usps')}>
+                  <div className="a_c_d_b_d_item_body">
+                    <Checkbox checked={delivery_preference.usps} {...label} icon={<CheckCircleOutlineIcon />} checkedIcon={<CheckCircleIcon />} />
+                    <span style={{marginLeft: '0.5rem', width: '90%'}}>
+                      <h3>USPS</h3>
+                      <p>Shipment will arrive in about 1-2 days shipping</p>
+                    </span>
+                  </div>
+                  <p>$11.50</p>
+                </div>
+                <div className="a_c_d_b_d_item" style={{borderColor: delivery_preference.pickup && 'var(--primary-text-accent)', backgroundColor:delivery_preference.pickup && '#f6f3ff' }} onClick={() => handleCheckboxChange('pickup')}>
+                  <div className="a_c_d_b_d_item_body">
+                    <Checkbox checked={delivery_preference.pickup} {...label} icon={<CheckCircleOutlineIcon />} checkedIcon={<CheckCircleIcon />} />
+                    <span style={{marginLeft: '0.5rem', width: '90%'}}>
+                      <h3>Pickup</h3>
+                      <p>Pickup your order at our main location. Orders usually process after 24 hours.</p>
+                    </span>
+                  </div>
+                  <p>FREE</p>
+                </div>
+              </div>
             </CSSTransition>
             <CSSTransition delay={500} in={step === 2} classNames="a_c_d_b_transition_2" timeout={1000} unmountOnExit>
               <p>Payment</p>
