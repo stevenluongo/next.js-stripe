@@ -28,6 +28,7 @@
 
 .a_nav span h3 {
   color: var(--primary-text-color);
+  font-weight: 500;
 }
 
 .a_nav span svg {
@@ -366,6 +367,38 @@
   color: #838285;
   font-size: 13px;
   text-decoration: underline;
+}
+
+.a_s_b_credits {
+  position: absolute;
+  bottom: 2rem;
+  width: var(--content-width);
+  margin: 0 auto;
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.a_s_b_credits p {
+  font-size: 14px;
+  color: #696969;
+  width: var(--content-width);
+  margin: 0 auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+}
+
+.a_s_b_credits a {
+  text-decoration: underline;
+  color: #a5a5a5;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: .25rem;
 }
 
 :root, body[data-theme="default"] {

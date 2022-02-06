@@ -18,6 +18,7 @@
         align-items: center;
         h3 {
             color: var(--primary-text-color);
+            font-weight: 500;
         }
         svg {
             color: var(--primary-text-color);
@@ -268,5 +269,29 @@
         color: #838285;
         font-size: 13px;
         text-decoration: underline;
+    }
+}
+
+.a_s_b_credits {
+    position: absolute;
+    bottom: 2rem;
+    width: var(--content-width);
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    p {
+        font-size: 14px;
+        color: #696969;
+        width: var(--content-width);
+        margin: 0 auto;
+        display: flex;
+        justify-content: flex-end;
+    }
+    a {
+        text-decoration: underline;
+        color: rgb(165, 165, 165);
+        font-weight: 500;
+        cursor: pointer;
+        margin-left: .25rem;
     }
 }
