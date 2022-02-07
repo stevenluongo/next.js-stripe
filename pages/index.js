@@ -140,7 +140,7 @@ export default function Index () {
             className="a_c_s_bubble a_c_s_bubble_outline" 
             style={{backgroundColor: step === 0 ? 'var(--primary-text-accent)' : 'transparent'}}
           >
-            <span onClick={() => !isProcessing && setStep(0)}>
+            <span onClick={() => !isProcessing && step > 0 && setStep(0)}>
               <p style={{color: step === 0 ? 'var(--primary-text-accent)' : '#bfbcc4'}}>Step 01</p>
               <h1 style={{color: step === 0 ? 'var(--primary-text-color)' : '#bfbcc4', fontSize: step === 0 ? '1.8em' : '1.2em'}}>Personal Details</h1>
             </span>
@@ -150,7 +150,7 @@ export default function Index () {
             className="a_c_s_bubble a_c_s_bubble_outline" 
             style={{backgroundColor: step === 1 ? 'var(--primary-text-accent)' : 'transparent'}}
           >
-            <span onClick={() => !isProcessing && setStep(1)}>
+            <span onClick={() => !isProcessing && step > 1 && setStep(1)}>
               <p style={{color: step === 1 ? 'var(--primary-text-accent)' : '#bfbcc4'}}>Step 02</p>
               <h1 style={{color: step === 1 ? 'var(--primary-text-color)' : '#bfbcc4', fontSize: step === 1 ? '1.8em' : '1.2em'}}>Delivery</h1>
             </span>
@@ -160,7 +160,7 @@ export default function Index () {
             className="a_c_s_bubble a_c_s_bubble_outline" 
             style={{backgroundColor: step === 2 ? 'var(--primary-text-accent)' : 'transparent'}}
           >
-            <span onClick={() => !isProcessing && setStep(2)}>
+            <span onClick={() => !isProcessing && step > 2 && setStep(2)}>
               <p style={{color: step === 2 ? 'var(--primary-text-accent)' : '#bfbcc4'}}>Step 03</p>
               <h1 style={{color: step === 2 ? 'var(--primary-text-color)' : '#bfbcc4', fontSize: step === 2 ? '1.8em' : '1.2em'}}>Payment</h1>
             </span>
