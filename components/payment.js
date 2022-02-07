@@ -3,10 +3,13 @@ import { destroyCookie, parseCookies, setCookie } from "nookies";
 import { useRouter } from "next/router";
 import { useState, forwardRef, useImperativeHandle } from "react"
 import { fetchPaymentIntent, appendInvoiceItems, finalizeStripeInvoice, createStripeCustomer, createStripeInvoice, calculateShipping, checkoutStorage } from "../lib/stripe";
+import { useGlobalContext } from '../context/global-context';
+import TransitionContainer from '../utils/transition-container';
 
-const Checkout = forwardRef((props, ref) => {
+const Payment = forwardRef((props, ref) => {
     const [payment_message, setPaymentMessage] = useState(null);
     const router = useRouter();
+    const {step} = useGlobalContext();
   
     //hooks
     const stripe = useStripe();
@@ -102,13 +105,20 @@ const Checkout = forwardRef((props, ref) => {
     }));
     
     return (
-        <form style={{width: 250}}>
-            <CardElement/>
-            {payment_message && <p>{payment_message.msgBody}</p>}
-        </form>
+        <TransitionContainer delay={500} in={step === 2} classNames="a_c_d_b_transition_2" timeout={1000} unmountOnExit>
+            <form style={{width: 250}}>
+                <CardElement/>
+                {payment_message && <p>{payment_message.msgBody}</p>}
+            </form>
+        </TransitionContainer>
     )
 });
   
+
+Payment.displayName = 'Payment';
+
+export default Payment;
+
 const confirmCardPayment = async(payment_intent, elements, stripe) => {
     const {error, paymentIntent} = await stripe.confirmCardPayment(payment_intent.client_secret, {
         payment_method: {
@@ -119,7 +129,3 @@ const confirmCardPayment = async(payment_intent, elements, stripe) => {
     if(error) throw new Error(error.message, error.type);
     return paymentIntent;
 }
-
-Checkout.displayName = 'Checkout';
-
-export default Checkout;

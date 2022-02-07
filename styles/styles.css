@@ -67,9 +67,10 @@
   margin: 0;
   width: 2px;
   height: 500px;
+  height: 70px;
   border: 1px dashed #e2e2e2;
-  -webkit-transition: height 0.75s ease;
-  transition: height 0.75s ease;
+  -webkit-transition: height 0.75s ease !important;
+  transition: height 0.75s ease !important;
 }
 
 .a_c_stepper .a_c_s_bubble {
@@ -81,16 +82,21 @@
   position: relative;
   -webkit-transition: background-color 1s ease;
   transition: background-color 1s ease;
+  border-color: #8e899b;
 }
 
-.a_c_stepper .a_c_s_bubble span {
+.a_c_stepper .a_c_s_bubble .a_c_s_content_wrapper {
   position: absolute;
   left: 100%;
-  width: 300px;
+  width: 600px;
   margin-left: 2rem;
+  cursor: pointer;
+  height: 70px;
+  -webkit-transition: height 0.75s ease;
+  transition: height 0.75s ease;
 }
 
-.a_c_stepper .a_c_s_bubble span p {
+.a_c_stepper .a_c_s_bubble .a_c_s_content_wrapper .a_c_s_step_label {
   color: var(--primary-text-accent);
   font-weight: 600;
   margin-bottom: 0.5rem;
@@ -98,7 +104,7 @@
   transition: color 1s ease;
 }
 
-.a_c_stepper .a_c_s_bubble span h1 {
+.a_c_stepper .a_c_s_bubble .a_c_s_content_wrapper .a_c_s_label {
   color: var(--primary-text-color);
   font-size: 1.8em;
   font-weight: 700;
@@ -106,29 +112,8 @@
   transition: color 1s ease, font-size 0.5s ease;
 }
 
-.a_c_stepper .a_c_s_bubble_outline {
-  background-color: transparent;
-  border-color: #8e899b;
-}
-
-.a_c_stepper .a_c_s_bubble_outline span {
-  cursor: pointer;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-}
-
-.a_c_stepper .a_c_s_bubble_outline span p {
-  color: #bfbcc4;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.a_c_stepper .a_c_s_bubble_outline span h1 {
-  color: #b1b1b1;
-  font-size: 1.2em;
-  font-weight: 700;
+.a_c_stepper .a_c_s_bubble .a_c_s_content {
+  margin-top: 2rem;
 }
 
 .a_c_display {
@@ -158,7 +143,6 @@
 }
 
 .a_c_d_b_details {
-  margin-top: 1.5rem;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -166,7 +150,7 @@
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
-  width: 70%;
+  height: 325px;
 }
 
 .a_c_d_b_details .a_c_d_b_details_double {
@@ -222,7 +206,6 @@
 }
 
 .a_c_d_b_delivery {
-  margin-top: 1rem;
   width: 100%;
 }
 

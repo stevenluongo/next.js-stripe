@@ -2,7 +2,7 @@ import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-export const VisualizeButton = styled(LoadingButton)({
+export const LoadingBtn = styled(LoadingButton)({
     color: '#cfc4ff',
     backgroundColor: 'var(--primary-text-accent)',
     color: '#fff',
@@ -33,7 +33,6 @@ export const CssTextField = styled(TextField)({
       padding: '1rem'
     },
     '& .MuiOutlinedInput-root': {
-      marginBottom: '1.25rem',
       '& fieldset': {
         border: '2px solid #d8d8d8',
         transition: 'border-color 0.5s ease',
